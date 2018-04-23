@@ -38,7 +38,6 @@ class User(UserMixin, db.Model):
 
 	def check_password(self, password):
 		return check_password_hash(self.password_hash, password)
-
 	
 	def avatar(self, size):
 		digest=md5(self.email.lower().encode('utf-8')).hexdigest()
@@ -78,7 +77,7 @@ class User(UserMixin, db.Model):
 def load_user(id):
 	return User.query.get(int(id))
 
-class Post(UserMixin, db.Model):
+class Post( db.Model):
 	__tablename__='posts'
 	id=db.Column(db.Integer, primary_key=True)
 	body=db.Column(db.String(140))

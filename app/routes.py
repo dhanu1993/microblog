@@ -36,7 +36,7 @@ def login():
     
     form=LoginForm()
     if form.validate_on_submit():
-        user=User.query.filter_by(username=form.username.data).first()
+        user=User.query.filter_by(username=form.username.data).first() or User.query.filter_by(email = form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username and password.')
             return redirect(url_for('login'))
@@ -71,14 +71,16 @@ def register():
     return render_template('register.html', title='register',  form=form)
 
 @app.route('/user/<username>')
-@login_required
+@login_required  
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts=[
-        {'author':user, 'body':'Test post #1'},
-        {'author':user, 'body':'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    page = request.args.get('page', 1, int)
+    posts = user.posts.order_by(Post.timestamp.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('user',username=user.username, page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('user', username=user.username, page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template('user.html', user=user, posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 
 @app.before_request
