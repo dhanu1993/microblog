@@ -1,0 +1,19 @@
+language:
+    - python
+python:
+    - "2.7"
+    - "3.6"
+install:
+    - pip install -r requirements.txt 
+script: 
+    - nosetests
+
+deploye:
+  provider: heroku
+  api_key:
+    secure: Kq95wr8v6rGlspuTt3Y8NdPse2eandSAF0DGmQm
+  app: murmuring-castle-18998
+  on:
+    branch: master
+    python: "3.6"
+    repo: dhanu1993/microblog
